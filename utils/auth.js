@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs')
 const { SECRET, OTP_CONFIG, OTP_LENGTH } = require('../config/setup')
 const User = require('../schema/users')
-const passport = require("passport");
 const jwt = require('jsonwebtoken');
 const { sendMail } = require('../sendMail/send')
 
@@ -20,6 +19,7 @@ const validateEmail = async(email) => {
 
 const emailRegister = async(userDetail, res) => {
     let usernameTaken = await validateUsername(userDetail.username)
+    
     if(usernameTaken){
         return res.status(400).json({
             message: "This username is already taken",
@@ -73,6 +73,7 @@ const userLogin = async(userCreds, res) => {
             username: user.username,
             role: user.role,
             email: user.email,
+            name: user.name,
             token: token,
         }
 

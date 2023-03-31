@@ -6,7 +6,7 @@ const itemSchema = mongoose.Schema({
         required: true,
         trim: true 
     },
-    'category': {
+    'category': { 
         type: String,
         required: true 
     },
@@ -16,7 +16,7 @@ const itemSchema = mongoose.Schema({
     },
     'totalQuantity': {
         type: Number,
-        required: true 
+        required: true
     }
 })
 

@@ -2,14 +2,17 @@ const mongoose = require('mongoose')
 const express = require('express')
 const bodyParser = require('body-parser')
 const db  = require('./config/setup').DB
+const cors = require('cors')
 
+const app = express()
+
+app.use(express.json());
+app.use("/api/users", require("./routes/router"));
+app.use(cors())
 
 mongoose.connect(db).then(()=>{
     console.log("MongoDB connected successfully")
 }).catch(err=>console.log(err))
-const app = express()
-app.use(bodyParser());
-app.use("/api/users", require("./routes/router"));
 
 
 app.listen(3000, () => {
