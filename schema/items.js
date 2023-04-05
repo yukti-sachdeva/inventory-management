@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const itemSchema = mongoose.Schema({
+const itemSchema = new mongoose.Schema({
     'itemName': {
         type: String,
         required: true,
@@ -17,6 +17,10 @@ const itemSchema = mongoose.Schema({
     'totalQuantity': {
         type: Number,
         required: true
+    },
+    'image': {
+        type: String,
+        default:""
     }
 })
 

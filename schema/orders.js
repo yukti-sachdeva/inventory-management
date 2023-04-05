@@ -7,12 +7,10 @@ const orderSchema = mongoose.Schema({
     "itemList": [{itemName: String, quantity: Number}],
 
     "totalItems": {
-        type: Number,
-        required: true 
+        type: Number
     },
     "totalPrice": {
-        type: Number,
-        required: true 
+        type: Number
     },
     "orderStatus": {
         type: String,

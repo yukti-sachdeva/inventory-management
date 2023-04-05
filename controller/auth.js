@@ -17,7 +17,8 @@ const validateEmail = async(email) => {
 }
 
 
-const emailRegister = async(userDetail, res) => {
+const emailRegister = async(req, res) => {
+    let userDetail = req.body 
     let usernameTaken = await validateUsername(userDetail.username)
     
     if(usernameTaken){
@@ -33,7 +34,7 @@ const emailRegister = async(userDetail, res) => {
             success: false 
         })
     }
-    const password = await bcrypt.hash(userDetail.password, 8)
+    const password = await bcrypt.hash(req.body.password, 8)
     
     const newUser = new User({
         ...userDetail,
@@ -48,9 +49,9 @@ const emailRegister = async(userDetail, res) => {
 
 }
 
-const userLogin = async(userCreds, res) => {
-    console.log(userCreds);
-    let { email, password} = userCreds;
+const userLogin = async(req, res) => {
+    //console.log(userCreds);
+    let { email, password} = req.body;
     const user = await User.findOne({email})
     if(!user){
         return res.status(404).json({
@@ -129,6 +130,11 @@ const serializeUser = user => {
   const generateOTP = () => {
     const OTP = otpGenerator.generate(OTP_LENGTH, OTP_CONFIG)
     return OTP 
+}
+
+const checkRole = async(userDetail, res) => {
+    let {role} = userDetail
+    
 }
 
 module.exports = {emailRegister, verifyToken, userLogin, serializeUser}
