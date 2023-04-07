@@ -23,4 +23,5 @@ const userSchema = mongoose.Schema({
         enum: ['staff', 'admin']
     }
 })
+
 module.exports=mongoose.model("user",userSchema)    

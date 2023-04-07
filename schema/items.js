@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const categories = ['pen', 'pencil', 'eraser', 'sharpener', 'books', 'notebooks']
+//const {categories} = require('../enums/catagory');
 
 const itemSchema = new mongoose.Schema({
     'itemName': {
@@ -8,7 +10,8 @@ const itemSchema = new mongoose.Schema({
     },
     'category': { 
         type: String,
-        required: true 
+        required: true,
+        enum: categories
     },
     'MRP': {
         type: Number,
@@ -22,6 +25,8 @@ const itemSchema = new mongoose.Schema({
         type: String,
         default:""
     }
-})
+},
+{timestamps:true})
 
-module.exports = mongoose.model("item",itemSchema)   
+const Item = mongoose.model("item",itemSchema)  
+module.exports = {Item, categories}

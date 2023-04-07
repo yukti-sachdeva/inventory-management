@@ -4,7 +4,7 @@ const orderSchema = mongoose.Schema({
     "orderId": {
         type: mongoose.Schema.Types.ObjectId
     },
-    "itemList": [{itemName: String, quantity: Number}],
+    "itemList": [{ itemName: String, quantity: Number }],
 
     "totalItems": {
         type: Number
@@ -16,11 +16,9 @@ const orderSchema = mongoose.Schema({
         type: String,
         default: "new",
         enum: ["new", "pending", "completed", "cancelled"]
-    },
-    'date': {
-        type: Date,
-        default: Date.now
     }
-})
+},
+    { timestamps: true }
+)
 
 module.exports = mongoose.model("orders", orderSchema)

@@ -1,4 +1,11 @@
-const Item = require('../schema/items')
+//const Item = require('../schema/items')
+const {Item, categories } = require('../schema/items')
+//const { categories } = require('../enums/catagory');
+const errorHandler=require("../utils/errorHandler")
+const findOrder = require('../controller/salesController')
+
+//let category = Item.categories;
+
 const cloudinary = require("cloudinary");
     cloudinary.config({
      cloud_name: process.env.CLOUD_NAME,
@@ -6,9 +13,14 @@ const cloudinary = require("cloudinary");
      api_secret: process.env.CLOUD_API_SECRET 
    });
 
-const existItem = async(itemName) => {
-    let item = await Item.findOne({itemName})
+const existItem = async(name) => {
+    let item = await Item.findOne({itemName:name})
     return item
+}
+
+const existCategory = async(categoryName) => {
+    let category = await Item.findOne({category: categoryName})
+    return category 
 }
 
 const newItem = async(req, res) => {
@@ -26,6 +38,7 @@ const newItem = async(req, res) => {
 }
 
 const addItem = async(req, res) => {
+    const itemDetail = req.body 
     const itemExist = await Item.findOne({itemName: req.body.itemName})
     if(itemExist){
         await itemExist.updateOne({totalQuantity: itemExist.totalQuantity+itemDetail.totalQuantity})
@@ -40,7 +53,8 @@ const addItem = async(req, res) => {
 }
 
 const deleteItem = async(req, res) => {
-    const itemExist = await Item.findOne({itemName: req.body.itemName})
+    itemName = req.body.itemName
+    const itemExist = await Item.findOne({itemName: itemName})
     console.log("1111111", itemName)
     try{
     if(itemExist){
@@ -50,17 +64,17 @@ const deleteItem = async(req, res) => {
             success: true 
         })
     }
-    return res.status(404).json({
-        message: "Item not found",
-        success: false 
-    })}
-    catch(error){
-        console.log(error)
-    }
+   throw new errorHandler("No item found",404)
+    
 }
-
+catch(error){
+    console.log(error)
+}
+}
 const removeItem = async(req, res) => {
+    const itemDetail = req.body
     const itemExist = await Item.findOne({itemName: req.body.itemName})
+    try{
     if(itemExist){
         await itemExist.updateOne({totalQuantity: itemExist.totalQuantity-itemDetail.totalQuantity})
         return res.status(200).json({
@@ -68,14 +82,17 @@ const removeItem = async(req, res) => {
             success: true 
         })
     }
-    return res.status(404).json({
-        message: "Item not found",
-        success: false 
-    })
+    throw new errorHandler("No item found",404)
+    }
+    catch(error){
+        console.log(error)
+    }
+
 }
 
 const updateItem = async(req, res) => {
-    const itemDetail = req.body.itemDetail;
+    console.log(req.body)
+    const itemDetail = req.body;
     console.log("entered......");
     const itemExist = await existItem(itemDetail.itemName)
     if(itemExist){
@@ -89,6 +106,40 @@ const updateItem = async(req, res) => {
     return res.status(404).json({
         message: "Item not found",
         success: false 
+    })
+}
+
+const getItem = async(req, res) => {
+    // return res.send("hello")
+    const itemCategory = req.query
+    const itemExist = await existCategory(itemCategory.category)
+    console.log()
+    
+    if(itemExist) {
+        const items = await Item.find({category: itemCategory.category})
+        //console.log(">>>> ",items);
+        return res.status(200).json({
+            message: "Item is found",
+            items,
+            success: true 
+        })
+    }
+    return res.status(404).json({
+        message: "Not found",
+        success: false 
+    })
+}
+
+const getCategory = async (req, res) => {
+   //const q = req.query.date;
+//    console.log(q,moment(q).format())
+   //let result = await Item.find({createdAt: { $lt : moment(q).format()}})
+
+//    console.log('result>>>', result)
+    return res.json({
+        message: "fine",
+        categories,
+        success: true
     })
 }
 
@@ -121,4 +172,4 @@ const uploadImage = async(req, res) => {
 
 // existItem("fghj").then((data) => console.log(data)).catch(err => console.log(err))
 
-module.exports = {addItem,existItem, deleteItem, removeItem, updateItem, uploadImage}
+module.exports = {addItem,existItem, deleteItem, removeItem, updateItem, getItem, getCategory, uploadImage}

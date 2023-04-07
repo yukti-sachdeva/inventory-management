@@ -2,7 +2,8 @@ const bcrypt = require('bcryptjs')
 const { SECRET, OTP_CONFIG, OTP_LENGTH } = require('../config/setup')
 const User = require('../schema/users')
 const jwt = require('jsonwebtoken');
-const { sendMail } = require('../sendMail/send')
+const { sendMail } = require('../utils/send');
+const errorHandler = require("../utils/errorHandler");
 
 console.log(SECRET);
 
@@ -22,17 +23,11 @@ const emailRegister = async(req, res) => {
     let usernameTaken = await validateUsername(userDetail.username)
     
     if(usernameTaken){
-        return res.status(400).json({
-            message: "This username is already taken",
-            success: false 
-        })
+       throw new errorHandler("userName Already Taken ",400)
     }
     let emailRegistered = await validateEmail(userDetail.email)
     if (emailRegistered){
-        return res.status(400).json({
-            message: "This email is already registered",
-            success: false 
-        })
+       throw new errorHandler("Email Already Taken",400)
     }
     const password = await bcrypt.hash(req.body.password, 8)
     
@@ -54,10 +49,8 @@ const userLogin = async(req, res) => {
     let { email, password} = req.body;
     const user = await User.findOne({email})
     if(!user){
-        return res.status(404).json({
-            message: "User does not exist",
-            success: false
-        })
+        throw new errorHandler("User not",404)
+       
     }
     let isMatch = await bcrypt.compare(password, user.password)
     if(isMatch){

@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { emailRegister, verifyToken, userLogin } = require('../controller/auth')
-const { addItem, deleteItem, removeItem, updateItem, uploadImage } = require('../controller/itemsController')
+const { addItem, deleteItem, removeItem, updateItem, uploadImage, getItem, getCategory } = require('../controller/itemsController')
 const { newOrder, deleteOrder } = require("../controller/ordersController")
 // const itemModel=require('../schema/items')
 const {upload} = require('../utils/multer')
@@ -25,16 +25,12 @@ router.put("/remove-item", removeItem)
 
 router.put("/update-item", updateItem)
 
+router.get("/get-item", getItem)
+router.get("/get-category", getCategory)
 
-// async(req, res) => {
-//     await updateItem(req.body, res)
-//})
+
 router.post("/add-order", async(req, res) => {
     await newOrder(req.body, res)
-    // return res.json({
-    //     success: true,
-    //     data: order
-    // }) 
 })
 
 router.delete("/delete-order", async(req, res) => {

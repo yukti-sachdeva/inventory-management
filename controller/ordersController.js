@@ -1,19 +1,20 @@
-const Item = require('../schema/items')
+const errorHandler = require('error-handler')
+const {Item} = require('../schema/items')
 const Order = require('../schema/orders')
+
 
 const newOrder = async(orderDetails, res) => {
     let order = new Order({...orderDetails})
+    console.log(order)
     const items = order.itemList
+    console.log(items);
     let total = 0;
     let amount = 0
     for(const i of items) {
         total = total + i._doc.quantity
         const item = await Item.findOne({itemName: i._doc.itemName})
         if(!item){
-            return res.status(404).json({
-                message: "Item not found",
-                success: false 
-            })
+        throw new errorHandler("no item found",404)
         }
         console.log(item._doc.MRP)
         amount += item._doc.MRP * i._doc.quantity
