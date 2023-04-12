@@ -34,6 +34,9 @@ module.exports = (err, req, res, next) => {
 
 
     // sending response to frontend
+    console.log("37>>", err.statusCode);
+    console.log("37>>", err.message);
+
     res.status(err.statusCode).json({
         success: false,
         error: err.message,

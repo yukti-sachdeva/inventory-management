@@ -119,15 +119,63 @@ const serializeUser = user => {
       createdAt: user.createdAt
     };
   };
+
+  const getUser = async(req, res) => {
+    let users = await User.find({})
+    return res.status(200).json({
+        message: "Here are all the users",
+        users: users,
+        success: true 
+    })
+  }
   
   const generateOTP = () => {
     const OTP = otpGenerator.generate(OTP_LENGTH, OTP_CONFIG)
     return OTP 
 }
 
-const checkRole = async(userDetail, res) => {
-    let {role} = userDetail
-    
+const updatePassword = async(req, res) => {
+    const {email, oldPassword, newPassword}  = req.body
+    const user = await User.findOne({email})
+    if(!user){
+        throw new errorHandler("User not",404)
+       
+    }
+    let isMatch = await bcrypt.compare(oldPassword, user.password)
+    if(isMatch){
+        const password = await bcrypt.hash(newPassword, 8)
+        await User.findByIdAndUpdate(user._id, {password: password})
+        return res.status(200).json({
+            message: "password updated successfully",
+            success: true 
+        })
+    }
+    else{
+        return res.status(403).json({
+            message: "Incorrect password",
+            success: false 
+        })
+    }
+
 }
 
-module.exports = {emailRegister, verifyToken, userLogin, serializeUser}
+const updateRole = async(req, res) => {
+    const {email,  role} = req.body
+    console.log(email)
+    const user = await User.findOne({email: email})
+    if(!user){
+        throw new errorHandler("User not found",404)
+       
+    }
+    await User.findByIdAndUpdate(user._id, {role: role})
+        return res.status(200).json({
+            message: "Role updated successfully",
+            success: true 
+        })
+    
+   
+    
+
+}
+
+module.exports = {emailRegister, verifyToken, userLogin, serializeUser, getUser, updatePassword, updateRole}

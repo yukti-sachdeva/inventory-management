@@ -1,39 +1,54 @@
-const errorHandler = require('error-handler')
+//const errorHandler = require('../')
 const {Item} = require('../schema/items')
 const Order = require('../schema/orders')
+const {getMonthlyOrder, getDailyOrder} = require("../controller/salesController")
+const { existItem } = require('./itemsController')
+const ErrorHandler = require('../utils/errorHandler')
 
-
-const newOrder = async(orderDetails, res) => {
-    let order = new Order({...orderDetails})
-    console.log(order)
-    const items = order.itemList
+const newOrder = async(req, res, next) => {
+    try {
+        
+    const orderDetails = req.body 
+    const items = orderDetails.itemList
     console.log(items);
     let total = 0;
     let amount = 0
     for(const i of items) {
-        total = total + i._doc.quantity
-        const item = await Item.findOne({itemName: i._doc.itemName})
+        total = total + i.quantity
+        const item = await Item.findOne({itemName: i.itemName})
         if(!item){
-        throw new errorHandler("no item found",404)
+         throw new ErrorHandler("no item found",404)
         }
-        console.log(item._doc.MRP)
-        amount += item._doc.MRP * i._doc.quantity
-        await item.updateOne({totalQuantity: item.totalQuantity - i._doc.quantity})
+    if(i.quantity > item.totalQuantity){
+      throw new ErrorHandler("insufficient quantity", 412)
+        
     }
-    order.totalItems = total 
-    order.totalPrice = amount 
+        console.log("21>>>",orderDetails.itemList);
+        i.itemId = item._id.toString()
+        amount += item.MRP * i.quantity
+        await item.updateOne({totalQuantity: item.totalQuantity - i.quantity})
+    }
+    orderDetails.totalItems = total 
+    orderDetails.totalPrice = amount 
     console.log(amount)
-    await order.save()
-    await order.updateOne({orderStatus: "pending"})
+    orderDetails["orderStatus"] = "pending"
+    const order = await Order.create({...orderDetails, itemList: items})
+
     return res.status(200).json({
-        ...orderDetails,
+        ...order.toObject(),
         message: "Order made successfully",
         success: true 
     })
     
+
+    } catch (error) {
+        console.log("err>>", error.statusCode, error.message);
+        next(error)
+    }
 }
 
-const deleteOrder = async (orderDetails, res) => {
+const deleteOrder = async (req, res) => {
+    const orderDetails = req.body
     const order = await Order.findById({_id:orderDetails.orderId})
     if(order){
         await order.deleteOne(order._id)
@@ -49,6 +64,24 @@ const deleteOrder = async (orderDetails, res) => {
 
 }
 
+const monthWiseOrder = async(req, res) => {
+    const orderDetails = await getMonthlyOrder()
+    return res.status(200).json({
+        message: "Order Details....",
+        orderDetails,
+        success: true 
+    })
+}
+
+const dailyOrder = async(req, res) => {
+    const orderDetails = await getDailyOrder()
+    return res.status(200).json({
+        message: "Daily Orders...",
+        orderDetails,
+        success: true 
+    })
+}
+
 //existItem("fghj").then((data) => console.log(data)).catch(err => console.log(err))
 
-module.exports = {newOrder, deleteOrder}
+module.exports = {newOrder, deleteOrder, monthWiseOrder, dailyOrder}

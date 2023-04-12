@@ -1,12 +1,9 @@
 const router = require('express').Router()
-const { emailRegister, verifyToken, userLogin } = require('../controller/auth')
+const { emailRegister, verifyToken, userLogin, getUser, updatePassword, updateRole } = require('../controller/auth')
 const { addItem, deleteItem, removeItem, updateItem, uploadImage, getItem, getCategory } = require('../controller/itemsController')
-const { newOrder, deleteOrder } = require("../controller/ordersController")
-// const itemModel=require('../schema/items')
+const { newOrder, deleteOrder, monthWiseOrder, dailyOrder } = require("../controller/ordersController")
 const {upload} = require('../utils/multer')
-
-// const multer = require("multer")
-// const upload = multer({storage: multer.diskStorage()}) 
+const {checkPermissions} = require('../middleware/role')
 
 router.post('/register-user', emailRegister)
 
@@ -16,28 +13,33 @@ router.get("/protected-route", verifyToken, async(req, res) => {
     res.send({message: "Successful"})
 })
 
-router.post("/add-item", addItem)
+router.get('/all-user', verifyToken, checkPermissions(['staff', 'admin'], 'role'), getUser)
 
-router.delete('/delete-item', deleteItem)
+router.post("/add-item", verifyToken, checkPermissions(['staff', 'admin'], 'role'), addItem)
 
-
-router.put("/remove-item", removeItem)
-
-router.put("/update-item", updateItem)
-
-router.get("/get-item", getItem)
-router.get("/get-category", getCategory)
+router.delete('/delete-item', verifyToken, checkPermissions(['admin'], 'role'), deleteItem)
 
 
-router.post("/add-order", async(req, res) => {
-    await newOrder(req.body, res)
-})
+router.put("/remove-item",verifyToken, checkPermissions(['staff','admin'], 'role'), removeItem)
 
-router.delete("/delete-order", async(req, res) => {
-    await deleteOrder(req.body, res)
-})
+router.put("/update-item", verifyToken, checkPermissions(['admin'], 'role'), updateItem)
 
-router.post("/upload", upload.single('file'), uploadImage)
+router.get("/get-item", verifyToken, checkPermissions(['staff', 'admin'], 'role'), getItem)
+router.get("/get-category", verifyToken, checkPermissions(['staff', 'admin'], 'role'), getCategory)
 
+
+router.post("/add-order", verifyToken, checkPermissions(['staff', 'admin'], 'role'), newOrder)
+
+router.delete("/delete-order", verifyToken, deleteOrder)
+
+router.post("/upload", verifyToken, checkPermissions(['admin'], 'role'),  upload.single('file'), uploadImage)
+
+router.get("/get-monthly-order", verifyToken, checkPermissions(['admin'], 'role'), monthWiseOrder)
+
+router.post("/reset-password", verifyToken, updatePassword)
+
+router.put("/change-role", verifyToken, checkPermissions(['admin'], 'role'), updateRole)
+
+router.get("/get-daily-order", verifyToken, checkPermissions(['admin'], 'role'), dailyOrder)
 
 module.exports = router

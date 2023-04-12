@@ -91,12 +91,11 @@ const removeItem = async(req, res) => {
 }
 
 const updateItem = async(req, res) => {
-    console.log(req.body)
     const itemDetail = req.body;
     console.log("entered......");
-    const itemExist = await existItem(itemDetail.itemName)
+    const itemExist = await Item.findById({_id: itemDetail._id})
     if(itemExist){
-        await itemExist.updateOne({category: itemDetail.category, MRP: itemDetail.MRP, totalQuantity: itemDetail.totalQuantity})
+        await itemExist.updateOne({itemName: itemDetail.itemName, category: itemDetail.category, MRP: itemDetail.MRP, totalQuantity: itemDetail.totalQuantity})
         console.log(itemExist)
         return res.status(200).json({
             message: "Items updated successfully",
@@ -148,7 +147,7 @@ const uploadImage = async(req, res) => {
     const itemName = req.body.itemName
     console.log(req.file)
 
-    console.log(itemName)
+    //console.log(itemName)
     const itemExist = await existItem(itemName)
     if(itemExist){
         cloudinary.uploader.upload(req.file.path, async result => {

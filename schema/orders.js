@@ -4,8 +4,15 @@ const orderSchema = mongoose.Schema({
     "orderId": {
         type: mongoose.Schema.Types.ObjectId
     },
-    "itemList": [{ itemName: String, quantity: Number }],
-
+    "itemList": [{ 
+        _id: false,
+        itemName: String, 
+        quantity: Number , 
+        itemId: {
+            ref: "items", 
+            type: mongoose.Schema.Types.ObjectId
+        }
+    }],
     "totalItems": {
         type: Number
     },
