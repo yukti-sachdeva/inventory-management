@@ -1,11 +1,11 @@
 const bcrypt = require('bcryptjs')
-const { SECRET, OTP_CONFIG, OTP_LENGTH } = require('../config/setup')
+const { SECRET } = require('../config/setup')
 const User = require('../schema/users')
 const jwt = require('jsonwebtoken');
-const { sendMail } = require('../utils/send');
-const errorHandler = require("../utils/errorHandler");
-
-console.log(SECRET);
+const ErrorHandler = require("../utils/errorHandler");
+const { sendMail } = require('../utils/sendMail');
+const {generateOtp} = require('../utils/verifyOtp')
+const {Otp} = require('../schema/otp')
 
 const validateUsername = async(username) => {
     let user = await User.findOne({username})
@@ -14,42 +14,80 @@ const validateUsername = async(username) => {
 
 const validateEmail = async(email) => {
     let user = await User.findOne({email})
-    return user ? true : false 
+    return user
 }
 
 
-const emailRegister = async(req, res) => {
-    let userDetail = req.body 
-    let usernameTaken = await validateUsername(userDetail.username)
-    
-    if(usernameTaken){
-       throw new errorHandler("userName Already Taken ",400)
-    }
-    let emailRegistered = await validateEmail(userDetail.email)
-    if (emailRegistered){
-       throw new errorHandler("Email Already Taken",400)
-    }
-    const password = await bcrypt.hash(req.body.password, 8)
-    
-    const newUser = new User({
-        ...userDetail,
-        password
-    })
+const emailRegister = async(req, res) => { 
+    try{
+    const userRegistered = await validateEmail(req.body.email)
+    if(userRegistered){
+        if(!userRegistered.isVerified){
+            const newOtp = generateOtp()
+            const checkUserinOtp = await Otp.findOne({email: req.body.email})
+            if(checkUserinOtp){
+                await checkUserinOtp.updateOne({otp: newOtp})
+                await sendMail({
+                    to: req.body.email,
+                    OTP: newOtp
+                })
+            }
+            else{
+                await Otp.create({
+                    email: req.body.email,
+                    otp: newOtp
+                })
+                await sendMail({
+                    to: req.body.email,
+                    OTP: newOtp
+                })
+            }
+        }
+        else{
+            return res.status(403).json({
+                message: "User is already registered and verified",
+                success: false
+            })
+        }
+    }else{
 
-    await newUser.save()
+        
+        const hashedPassword = await bcrypt.hash(req.body.password, 8)
+        await User.create({
+            email:req.body.email,
+        password:hashedPassword,
+        username:req.body.username,
+        name:req.body.name,
+        role:req.body.role
+    })
+    const otpGenerated = generateOtp()
+
+    await Otp.create({
+        email: req.body.email,
+        otp: otpGenerated
+    })
+    await sendMail({
+        to: req.body.email,
+        OTP: otpGenerated
+    })
+}
     return res.status(200).json({
-        message: "User registered successfully",
-        success: true 
+        message: `Verification email has been sent to ${req.body.email}`,
+        success: true
     })
-
+    }
+    catch(error){
+        console.log(error)
+    }
 }
+
 
 const userLogin = async(req, res) => {
     //console.log(userCreds);
     let { email, password} = req.body;
     const user = await User.findOne({email})
     if(!user){
-        throw new errorHandler("User not",404)
+        throw new ErrorHandler("User not found",404)
        
     }
     let isMatch = await bcrypt.compare(password, user.password)
@@ -58,7 +96,7 @@ const userLogin = async(req, res) => {
             user_id: user._id,
             role: user.role,
             username: user.username,
-            email: user.email 
+            email: user.email
         },
         SECRET,
         {expiresIn: "7 days"});
@@ -92,11 +130,13 @@ const verifyToken = async (req, res, next) => {
         headerToken = headerToken.split(' ')[1];
         try {
             const token =  jwt.verify(headerToken, SECRET)
-            console.log(token)
-            next();
+            const user = await User.findById(token.user_id)
+            if(!user){
+                throw new ErrorHandler("User not found", 404)
+            }
         } catch (error) {
             return res.status(403).json({
-                message: "Please add token to the header",
+                message: "Invalid token",
                 success: false 
             })
         }
@@ -107,6 +147,7 @@ const verifyToken = async (req, res, next) => {
             success: false 
         })
     }
+    next()
 }
 
 const serializeUser = user => {
@@ -129,34 +170,16 @@ const serializeUser = user => {
     })
   }
   
-  const generateOTP = () => {
-    const OTP = otpGenerator.generate(OTP_LENGTH, OTP_CONFIG)
-    return OTP 
-}
 
-const updatePassword = async(req, res) => {
-    const {email, oldPassword, newPassword}  = req.body
-    const user = await User.findOne({email})
-    if(!user){
-        throw new errorHandler("User not",404)
-       
-    }
-    let isMatch = await bcrypt.compare(oldPassword, user.password)
-    if(isMatch){
-        const password = await bcrypt.hash(newPassword, 8)
-        await User.findByIdAndUpdate(user._id, {password: password})
-        return res.status(200).json({
-            message: "password updated successfully",
-            success: true 
-        })
-    }
-    else{
-        return res.status(403).json({
-            message: "Incorrect password",
-            success: false 
-        })
-    }
+const resetPassword = async(req, res) => {
+    const {email, password} = req.body
 
+    const hashedPassword = await bcrypt.hash(password, 8)
+    await User.findOneAndUpdate({email: email}, {password: hashedPassword})
+    return res.status(200).json({
+        message: "Password changed successfully",
+        success: true 
+    })
 }
 
 const updateRole = async(req, res) => {
@@ -164,7 +187,7 @@ const updateRole = async(req, res) => {
     console.log(email)
     const user = await User.findOne({email: email})
     if(!user){
-        throw new errorHandler("User not found",404)
+        throw new ErrorHandler("User not found",404)
        
     }
     await User.findByIdAndUpdate(user._id, {role: role})
@@ -172,10 +195,6 @@ const updateRole = async(req, res) => {
             message: "Role updated successfully",
             success: true 
         })
-    
-   
-    
-
 }
 
-module.exports = {emailRegister, verifyToken, userLogin, serializeUser, getUser, updatePassword, updateRole}
+module.exports = {emailRegister, verifyToken, userLogin, serializeUser, getUser, resetPassword, updateRole}

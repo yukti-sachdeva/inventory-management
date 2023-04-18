@@ -1,24 +1,7 @@
-const Order = require("../schema/orders")
-const moment = require('moment')
-
-const oneYearAgo = new Date();
-oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+const orders = require("../schema/orders")
 
 
-yearNow = new Date()
-yearNow = yearNow.getFullYear()
-
-
-
-const findOrder = async() => await Order.find({
-    createdAt: { $gte: oneYearAgo }
-  }).then(result => {
-    console.log(result);
-  }).catch(err => {
-    console.log(err);
-  });
-
-const getMonthlyOrder = async() => await Order.aggregate([
+const getMonthlyOrder = async(date) => await orders.aggregate([
     {
       '$unwind': {
         'path': '$itemList'
@@ -72,13 +55,19 @@ const getMonthlyOrder = async() => await Order.aggregate([
     console.log(err);
   });
 
-  const getDailyOrder = async() => await Order.aggregate([
+  const getDailyOrder = async(startDate, endDate) => await orders.aggregate([
     {
-        '$unwind': {
-          'path': '$itemList'
+      '$match': {
+        'createdAt': {
+          '$gte': new Date(startDate), //2023-04-11T07:51:23.854+00:00
+          '$lte': new Date(endDate)
         }
-      },
-    {
+      }
+    }, {
+      '$unwind': {
+        'path': '$itemList'
+      }
+    }, {
       '$lookup': {
         'from': 'items', 
         'localField': 'itemList.itemId', 
@@ -92,35 +81,29 @@ const getMonthlyOrder = async() => await Order.aggregate([
     }, {
       '$group': {
         '_id': {
-          'category': '$items.category', 
-          'day': {
-            '$dateToString': {
-              'format': '%Y-%m-%d', 
-              'date': '$createdAt'
-            }
-          }
+          'category': '$items.category'
         }, 
         'totalItems': {
-            '$sum': '$itemList.quantity'
-          },
-          'totalPrice': {
-            '$sum': {
-              '$multiply': [
-                '$itemList.quantity', '$items.MRP'
-              ]
-            }
-          },
+          '$sum': '$itemList.quantity'
+        }, 
+        'totalPrice': {
+          '$sum': {
+            '$multiply': [
+              '$itemList.quantity', '$items.MRP'
+            ]
+          }
+        }, 
         'count': {
           '$sum': 1
         }
       }
     }, {
       '$group': {
-        '_id': '$_id.day', 
+        '_id': '$_id.category', 
         'categories': {
           '$push': {
             'category': '$_id.category', 
-            'totalSales': '$totalPrice',
+            'totalSales': '$totalPrice', 
             'totalItems': '$totalItems'
           }
         }
@@ -131,54 +114,4 @@ const getMonthlyOrder = async() => await Order.aggregate([
   }).catch(err => {
     console.log(err);
   });
-module.exports = {findOrder, getMonthlyOrder, getDailyOrder}
-
-// ([
-//     {
-//       '$unwind': {
-//         'path': '$itemList'
-//       }
-//     }, {
-//       '$lookup': {
-//         'from': 'items', 
-//         'localField': 'itemList.itemName', 
-//         'foreignField': 'itemName', 
-//         'as': 'items'
-//       }
-//     }, {
-//       '$unwind': {
-//         'path': '$items', 
-//         'preserveNullAndEmptyArrays': true
-//       }
-//     }, {
-//       '$group': {
-//         '_id': {
-//           'month': {
-//             '$month': '$createdAt'
-//           }, 
-//           'category': '$items.category'
-//         }, 
-//         'totalItems': {
-//           '$sum': '$itemList.quantity'
-//         }, 
-//         'totalPrice': {
-//           '$sum': {
-//             '$multiply': [
-//               '$itemList.quantity', '$items.MRP'
-//             ]
-//           }
-//         }
-//       }
-//     }, {
-//       '$group': {
-//         '_id': '$_id.month', 
-//         'categories': {
-//           '$push': {
-//             'category': '$_id.category', 
-//             'totalItems': '$totalItems', 
-//             'totalPrice': '$totalPrice'
-//           }
-//         }
-//       }
-//     }
-//   ])
+module.exports = { getMonthlyOrder, getDailyOrder}

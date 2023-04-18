@@ -1,10 +1,8 @@
-//const Item = require('../schema/items')
-const {Item, categories } = require('../schema/items')
-//const { categories } = require('../enums/catagory');
-const errorHandler=require("../utils/errorHandler")
-const findOrder = require('../controller/salesController')
 
-//let category = Item.categories;
+const {Item } = require('../schema/items')
+const ErrorHandler=require("../utils/errorHandler")
+const findOrder = require('../controller/salesController')
+const category = require('../schema/category')
 
 const cloudinary = require("cloudinary");
     cloudinary.config({
@@ -24,13 +22,18 @@ const existCategory = async(categoryName) => {
 }
 
 const newItem = async(req, res) => {
-    const userDetail = req.body
+    const itemDetail = req.body
     const item = new Item({
-        ...userDetail
+        ...itemDetail
     })
-    console.log(item);
-    const resp = await item.save();
-    console.log(resp);
+    const categoryFound = await category.findOne({categoryName: itemDetail.category})
+    if(!categoryFound){
+        return res.status(404).json({
+            message: "Category does not exist",
+            success: false
+        })
+    }
+    await item.save();
     return res.status(200).json({
         message: "Item added",
         success: true 
@@ -64,7 +67,7 @@ const deleteItem = async(req, res) => {
             success: true 
         })
     }
-   throw new errorHandler("No item found",404)
+   throw new ErrorHandler("No item found",404)
     
 }
 catch(error){
@@ -82,7 +85,7 @@ const removeItem = async(req, res) => {
             success: true 
         })
     }
-    throw new errorHandler("No item found",404)
+    throw new ErrorHandler("No item found",404)
     }
     catch(error){
         console.log(error)
@@ -129,20 +132,7 @@ const getItem = async(req, res) => {
     })
 }
 
-const getCategory = async (req, res) => {
-   //const q = req.query.date;
-//    console.log(q,moment(q).format())
-   //let result = await Item.find({createdAt: { $lt : moment(q).format()}})
-
-//    console.log('result>>>', result)
-    return res.json({
-        message: "fine",
-        categories,
-        success: true
-    })
-}
-
-const uploadImage = async(req, res) => {
+const uploadItemImage = async(req, res) => {
 
     const itemName = req.body.itemName
     console.log(req.file)
@@ -171,4 +161,4 @@ const uploadImage = async(req, res) => {
 
 // existItem("fghj").then((data) => console.log(data)).catch(err => console.log(err))
 
-module.exports = {addItem,existItem, deleteItem, removeItem, updateItem, getItem, getCategory, uploadImage}
+module.exports = {addItem,existItem, deleteItem, removeItem, updateItem, getItem,  uploadItemImage}

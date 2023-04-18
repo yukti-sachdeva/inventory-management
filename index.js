@@ -13,7 +13,7 @@ app.use(express.json());
 app.use("/api/users", require("./routes/router"));
 app.use(errorMiddleware)
 
-// mongoose.set("debug", true)
+mongoose.set("debug", true)
 mongoose.connect(db).then(()=>{
     console.log("MongoDB connected successfully")
 }).catch(err=>console.log(err))

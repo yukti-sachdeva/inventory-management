@@ -1,9 +1,9 @@
-//const errorHandler = require('../')
+
 const {Item} = require('../schema/items')
 const Order = require('../schema/orders')
 const {getMonthlyOrder, getDailyOrder} = require("../controller/salesController")
-const { existItem } = require('./itemsController')
 const ErrorHandler = require('../utils/errorHandler')
+const dayjs = require('dayjs')
 
 const newOrder = async(req, res, next) => {
     try {
@@ -74,7 +74,9 @@ const monthWiseOrder = async(req, res) => {
 }
 
 const dailyOrder = async(req, res) => {
-    const orderDetails = await getDailyOrder()
+    const startDate = dayjs(req.body.date).startOf('day').toDate()
+    const endDate = dayjs(req.body.date).endOf('day').toDate()
+    const orderDetails = await getDailyOrder(startDate, endDate)
     return res.status(200).json({
         message: "Daily Orders...",
         orderDetails,

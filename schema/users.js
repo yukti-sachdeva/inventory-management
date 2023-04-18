@@ -7,7 +7,8 @@ const userSchema = mongoose.Schema({
     },
     'email': {
         type: String,
-        required: true
+        required: true,
+        unique:true
     },
     'password': {
         type: String,
@@ -21,6 +22,10 @@ const userSchema = mongoose.Schema({
         type: String,
         default: 'staff',
         enum: ['staff', 'admin']
+    },
+    isVerified:{
+        type: Boolean,
+        default: false 
     }
 })
 

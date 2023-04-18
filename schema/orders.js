@@ -5,7 +5,7 @@ const orderSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId
     },
     "itemList": [{ 
-        _id: false,
+        // _id: false,
         itemName: String, 
         quantity: Number , 
         itemId: {
@@ -27,5 +27,4 @@ const orderSchema = mongoose.Schema({
 },
     { timestamps: true }
 )
-
 module.exports = mongoose.model("orders", orderSchema)
