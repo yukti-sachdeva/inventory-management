@@ -11,12 +11,13 @@ const cloudinary = require("cloudinary");
 
 const addCategory = async(req, res) => {
     console.log("12>>>>",req.body);
-    const {categoryName} = req.body
+    const {categoryName,description} = req.body
     console.log(req.file)
     cloudinary.uploader.upload(req.file.path, async result => {
         await category.create({
             categoryName: categoryName,
-            imageUrl: result.url 
+            imageUrl: result.url ,
+            description: description
         })
         return res.json({
                        success: true,

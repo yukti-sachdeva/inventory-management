@@ -65,7 +65,10 @@ const deleteOrder = async (req, res) => {
 }
 
 const monthWiseOrder = async(req, res) => {
-    const orderDetails = await getMonthlyOrder()
+    const startDate = dayjs(req.body.date).startOf('year').toDate()
+    const endDate = dayjs(req.body.date).endOf('year').toDate()
+    //console.log(startDate, endDate)
+    const orderDetails = await getMonthlyOrder(startDate, endDate)
     return res.status(200).json({
         message: "Order Details....",
         orderDetails,

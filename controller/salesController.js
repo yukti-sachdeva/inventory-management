@@ -1,7 +1,15 @@
 const orders = require("../schema/orders")
 
 
-const getMonthlyOrder = async(date) => await orders.aggregate([
+const getMonthlyOrder = async(startDate, endDate) => await orders.aggregate([
+  {
+    '$match': {
+      'createdAt': {
+        '$gte': new Date(startDate), //2023-04-11T07:51:23.854+00:00
+        '$lte': new Date(endDate)
+      }
+    }
+  },
     {
       '$unwind': {
         'path': '$itemList'
