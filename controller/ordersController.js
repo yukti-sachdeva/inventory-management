@@ -17,10 +17,16 @@ const newOrder = async(req, res, next) => {
         total = total + i.quantity
         const item = await Item.findOne({itemName: i.itemName})
         if(!item){
-         throw new ErrorHandler("no item found",404)
+            return res.status(404).json({
+                message: "Item not found",
+                success: false 
+            })
         }
     if(i.quantity > item.totalQuantity){
-      throw new ErrorHandler("insufficient quantity", 412)
+      return res.status(412).json({
+        message: "Quantity is already minimum",
+        success: false 
+      })
         
     }
         console.log("21>>>",orderDetails.itemList);

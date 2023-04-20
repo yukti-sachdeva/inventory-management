@@ -1,7 +1,9 @@
 const ErrorHandler = require("../utils/errorHandler");
 
-module.exports = (err, req, res, next) => {
+module.exports = (err,req, res, next) => {
+    console.log("starts here>>>>>>>>>>>>")
     err.message = err.message || "Internal Server Error";
+
     err.statusCode = err.statusCode || 500;
 
     if (err.name === "CastError") {
@@ -38,5 +40,4 @@ module.exports = (err, req, res, next) => {
         success: false,
         error: err.message
     });
-    next()
 };
