@@ -28,4 +28,8 @@ const sendEmail = async (options) => {
 
 await transporter.sendMail(mailOptions);
 };
+<<<<<<< HEAD
 module.exports = sendEmail;
+=======
+module.exports = sendEmail;
+>>>>>>> f7eeef9e27c21bc98b15dfb927277002af02f640
