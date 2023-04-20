@@ -3,7 +3,7 @@ const { SECRET } = require('../config/setup')
 const User = require('../schema/users')
 const jwt = require('jsonwebtoken');
 const ErrorHandler = require("../utils/errorHandler");
-const { sendMail } = require('../utils/sendMail');
+const  sendMail  = require('../utils/sendMail');
 const {generateOtp} = require('../utils/verifyOtp')
 const {Otp} = require('../schema/otp')
 
@@ -24,12 +24,21 @@ const emailRegister = async(req, res) => {
     if(userRegistered){
         if(!userRegistered.isVerified){
             const newOtp = generateOtp()
+		 const message = `<div
+            class="container"
+            style="max-width: 90%; margin: auto; padding-top: 20px"
+          >
+            <h4>You are officially In ✔</h4>
+            <p style="margin-bottom: 30px;">Please enter the verficaition OTP to get started</p>
+            <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center;">${newOtp}</h1>
+       </div>`
             const checkUserinOtp = await Otp.findOne({email: req.body.email})
             if(checkUserinOtp){
                 await checkUserinOtp.updateOne({otp: newOtp})
-                await sendMail({
-                    to: req.body.email,
-                    OTP: newOtp
+                 await sendMail({
+                    email:req.body.email,
+                    subject:`User verifiaction mail`,
+                    message:message
                 })
             }
             else{
@@ -37,9 +46,10 @@ const emailRegister = async(req, res) => {
                     email: req.body.email,
                     otp: newOtp
                 })
-                await sendMail({
-                    to: req.body.email,
-                    OTP: newOtp
+                 await sendMail({
+                    email:req.body.email,
+                    subject:`User verifiaction mail`,
+                    message:message
                 })
             }
         }
@@ -66,10 +76,19 @@ const emailRegister = async(req, res) => {
         email: req.body.email,
         otp: otpGenerated
     })
-    await sendMail({
-        to: req.body.email,
-        OTP: otpGenerated
-    })
+	const message = `<div
+    class="container"
+    style="max-width: 90%; margin: auto; padding-top: 20px"
+  >
+    <h4>You are officially In ✔</h4>
+    <p style="margin-bottom: 30px;">Please enter the verficaition OTP to get started</p>
+    <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center;">${otpGenerated}</h1>
+</div>`
+     await sendMail({
+                    email:req.body.email,
+                    subject:`User verifiaction mail`,
+                    message:message
+                })
 }
     return res.status(200).json({
         message: `Verification email has been sent to ${req.body.email}`,
@@ -84,12 +103,14 @@ const emailRegister = async(req, res) => {
 
 const userLogin = async(req, res) => {
     //console.log(userCreds);
+    try{
     let { email, password} = req.body;
     const user = await User.findOne({email})
     if(!user){
         throw new ErrorHandler("User not found",404)
        
     }
+	console.log(SECRET);
     let isMatch = await bcrypt.compare(password, user.password)
     if(isMatch){
         let token = jwt.sign({
@@ -115,12 +136,16 @@ const userLogin = async(req, res) => {
             success: true 
         })
     }
+
     else{
         return res.status(403).json({
             message: "Incorrect password",
             success: false 
         })
     }
+    }catch(error){
+	console.log(error)
+}
 }
 
 const verifyToken = async (req, res, next) => {
@@ -148,6 +173,7 @@ const verifyToken = async (req, res, next) => {
         })
     }
     next()
+
 }
 
 const serializeUser = user => {
@@ -183,18 +209,22 @@ const resetPassword = async(req, res) => {
 }
 
 const updateRole = async(req, res) => {
+    try{
     const {email,  role} = req.body
     console.log(email)
     const user = await User.findOne({email: email})
     if(!user){
         throw new ErrorHandler("User not found",404)
-       
     }
     await User.findByIdAndUpdate(user._id, {role: role})
         return res.status(200).json({
             message: "Role updated successfully",
             success: true 
         })
+    }
+    catch(error){
+	console.log(error)
+}
 }
 
 module.exports = {emailRegister, verifyToken, userLogin, serializeUser, getUser, resetPassword, updateRole}

@@ -12,7 +12,7 @@ app.use(cors())
 app.use(express.json());
 app.use("/api/users", require("./routes/router"));
 app.use(errorMiddleware)
-
+console.log(db)
 mongoose.set("debug", true)
 mongoose.connect(db).then(()=>{
     console.log("MongoDB connected successfully")

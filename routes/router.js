@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { emailRegister, verifyToken, userLogin, getUser, updateRole, resetPassword } = require('../controller/auth')
-const { addItem, deleteItem, removeItem, updateItem, uploadItemImage, getItem } = require('../controller/itemsController')
+const { addItem,  removeItem, updateItem, uploadItemImage, getItem } = require('../controller/itemsController')
 const { newOrder, deleteOrder, monthWiseOrder, dailyOrder } = require("../controller/ordersController")
 const {upload} = require('../utils/multer')
 const {checkPermissions} = require('../middleware/role')
@@ -23,7 +23,6 @@ router.get('/all-user', verifyToken, checkPermissions(['staff', 'admin']), getUs
 
 router.post("/add-item", verifyToken, checkPermissions(['staff', 'admin']), addItem)
 
-router.delete('/delete-item', verifyToken, checkPermissions(['admin']), deleteItem)
 
 router.put("/remove-item",verifyToken, checkPermissions(['staff','admin']), removeItem)
 
@@ -37,7 +36,7 @@ router.delete("/delete-order", verifyToken, deleteOrder)
 
 router.post("/upload-item-image", verifyToken, checkPermissions(['admin']),  upload.single('file'), uploadItemImage)
 
-router.get("/get-monthly-order", verifyToken, checkPermissions(['admin']), monthWiseOrder)
+router.post("/get-monthly-order", verifyToken, checkPermissions(['admin']), monthWiseOrder)
 
 router.post("/reset-password", verifyToken, checkPermissions(['admin']), resetPassword)
 
