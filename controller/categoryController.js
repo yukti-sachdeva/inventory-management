@@ -35,6 +35,7 @@ const deleteCategory = async(req, res) => {
             success: false 
         })
     }
+    await item.findOneAndUpdate({category: categoryName},{category: "Null"})
     return res.status(200).json({
         message: "Catgeory deleted successfully",
         success: true 
