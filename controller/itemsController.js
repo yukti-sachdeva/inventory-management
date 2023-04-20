@@ -159,8 +159,4 @@ const uploadItemImage = async(req, res) => {
 
 // existItem("fghj").then((data) => console.log(data)).catch(err => console.log(err))
 
-<<<<<<< HEAD
 module.exports = {addItem,existItem, removeItem, updateItem, getItem,  uploadItemImage}
-=======
-module.exports = {addItem,existItem, removeItem, updateItem, getItem,  uploadItemImage}
->>>>>>> f7eeef9e27c21bc98b15dfb927277002af02f640

@@ -39,8 +39,4 @@ module.exports = (err, req, res, next) => {
         error: err.message
     });
     next()
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> f7eeef9e27c21bc98b15dfb927277002af02f640
