@@ -1,4 +1,4 @@
-b{
+{
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",
     "accesscontrol": "^2.2.1",
