@@ -23,6 +23,7 @@ router.get('/all-user', verifyToken, checkPermissions(['staff', 'admin']), getUs
 
 router.post("/add-item", verifyToken, checkPermissions(['staff', 'admin']), addItem)
 
+// router.delete('/delete-item', verifyToken, checkPermissions(['admin']), deleteItem)
 
 router.put("/remove-item",verifyToken, checkPermissions(['staff','admin']), removeItem)
 

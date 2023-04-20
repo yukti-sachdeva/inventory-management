@@ -15,9 +15,6 @@ module.exports = (err, req, res, next) => {
         err = new ErrorHandler(message, 400);
     }
 
-
-
-
     // Wrong JWT error
 
     if (err.name === "JsonWebTokenError") {
@@ -39,8 +36,7 @@ module.exports = (err, req, res, next) => {
 
     return res.status(err.statusCode).json({
         success: false,
-        error: err.message,
+        error: err.message
     });
-    next();
-
+    next()
 };

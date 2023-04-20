@@ -3,7 +3,7 @@ const { SECRET } = require('../config/setup')
 const User = require('../schema/users')
 const jwt = require('jsonwebtoken');
 const ErrorHandler = require("../utils/errorHandler");
-const  sendMail  = require('../utils/sendMail');
+const sendMail = require('../utils/sendMail');
 const {generateOtp} = require('../utils/verifyOtp')
 const {Otp} = require('../schema/otp')
 
@@ -24,7 +24,7 @@ const emailRegister = async(req, res) => {
     if(userRegistered){
         if(!userRegistered.isVerified){
             const newOtp = generateOtp()
-		 const message = `<div
+            const message = `<div
             class="container"
             style="max-width: 90%; margin: auto; padding-top: 20px"
           >
@@ -32,21 +32,29 @@ const emailRegister = async(req, res) => {
             <p style="margin-bottom: 30px;">Please enter the verficaition OTP to get started</p>
             <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center;">${newOtp}</h1>
        </div>`
+            
             const checkUserinOtp = await Otp.findOne({email: req.body.email})
             if(checkUserinOtp){
                 await checkUserinOtp.updateOne({otp: newOtp})
-                 await sendMail({
+                
+                await sendMail({
                     email:req.body.email,
                     subject:`User verifiaction mail`,
                     message:message
                 })
+
+                // await sendMail({
+                //     to: req.body.email,
+                //     OTP: newOtp
+                // })
             }
             else{
                 await Otp.create({
                     email: req.body.email,
                     otp: newOtp
                 })
-                 await sendMail({
+                
+                await sendMail({
                     email:req.body.email,
                     subject:`User verifiaction mail`,
                     message:message
@@ -76,7 +84,7 @@ const emailRegister = async(req, res) => {
         email: req.body.email,
         otp: otpGenerated
     })
-	const message = `<div
+    const message = `<div
     class="container"
     style="max-width: 90%; margin: auto; padding-top: 20px"
   >
@@ -84,11 +92,11 @@ const emailRegister = async(req, res) => {
     <p style="margin-bottom: 30px;">Please enter the verficaition OTP to get started</p>
     <h1 style="font-size: 40px; letter-spacing: 2px; text-align:center;">${otpGenerated}</h1>
 </div>`
-     await sendMail({
-                    email:req.body.email,
-                    subject:`User verifiaction mail`,
-                    message:message
-                })
+    await sendMail({
+        email:req.body.email,
+        subject:`User verifiaction mail`,
+        message:message
+    })
 }
     return res.status(200).json({
         message: `Verification email has been sent to ${req.body.email}`,
