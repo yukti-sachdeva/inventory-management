@@ -55,29 +55,27 @@ const addItem = async(req, res) => {
     }
 }
 
-const deleteItem = async(req, res) => {
-    itemName = req.body.itemName
-    const itemExist = await Item.findOne({itemName: itemName})
-    console.log("1111111", itemName)
-    try{
-    if(itemExist){
-        await itemExist.deleteOne(itemExist._id)
-        return res.status(200).json({
-            message: "Item deleted successfully",
-            success: true 
-        })
-    }
-   throw new ErrorHandler("No item found",404)
-    
-}
-catch(error){
-    console.log(error)
-}
-}
+// const deleteItem = async(req, res) => {
+//     try{
+//         itemName = req.body.itemName
+//         const itemExist = await Item.findOne({itemName: itemName})
+//     if(itemExist){
+//         await itemExist.deleteOne(itemExist._id)
+//         return res.status(200).json({
+//             message: "Item deleted successfully",
+//             success: true 
+//         })
+//     }
+//    throw new ErrorHandler("No item found",404)
+// }
+// catch(error){
+//     console.log(error)
+// }
+// }
 const removeItem = async(req, res) => {
-    const itemDetail = req.body
-    const itemExist = await Item.findOne({itemName: req.body.itemName})
     try{
+        const itemDetail = req.body
+        const itemExist = await Item.findOne({itemName: req.body.itemName})
     if(itemExist){
         await itemExist.updateOne({totalQuantity: itemExist.totalQuantity-itemDetail.totalQuantity})
         return res.status(200).json({
@@ -103,7 +101,7 @@ const updateItem = async(req, res) => {
         return res.status(200).json({
             message: "Items updated successfully",
             success: true 
-        })
+        })  
     }
     return res.status(404).json({
         message: "Item not found",
@@ -161,4 +159,4 @@ const uploadItemImage = async(req, res) => {
 
 // existItem("fghj").then((data) => console.log(data)).catch(err => console.log(err))
 
-module.exports = {addItem,existItem, deleteItem, removeItem, updateItem, getItem,  uploadItemImage}
+module.exports = {addItem,existItem, removeItem, updateItem, getItem,  uploadItemImage}
