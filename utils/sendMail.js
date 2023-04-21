@@ -7,8 +7,8 @@ const sendEmail = async (options) => {
         service: 'gmail',
         secure: true,
         auth: {
-            user: 'yukti845@gmail.com',
-            pass: 'eqpakeumvrdxogsc'
+            user: 'alfredo.carroll92@ethereal.email',
+            pass: 'tRR5BtfknYUsT4YKG7'
         },
     });
 
