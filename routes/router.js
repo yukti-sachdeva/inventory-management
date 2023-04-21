@@ -9,8 +9,6 @@ const {addCategory, deleteCategory, getCategory} = require('../controller/catego
 
 router.post('/register-user', emailRegister)
 
-//router.post('/send-otp', sendOtp)
-
 router.post('/verify-otp', verifyOtp)
 
 router.post("/login-user", userLogin)
@@ -19,31 +17,31 @@ router.get("/protected-route", verifyToken, async(req, res) => {
     res.send({message: "Successful"})
 })
 
-router.get('/all-user', verifyToken, checkPermissions(['staff', 'admin']), getUser)
+router.get('/all-user', verifyToken, checkPermissions(['super-admin']), getUser)
 
-router.post("/add-item", verifyToken, checkPermissions(['staff', 'admin']), addItem)
+router.post("/add-item", verifyToken, checkPermissions(['admin']), addItem)
 
-// router.delete('/delete-item', verifyToken, checkPermissions(['admin']), deleteItem)
 
-router.put("/remove-item",verifyToken, checkPermissions(['staff','admin']), removeItem)
+
+router.post("/remove-item",verifyToken, checkPermissions(['admin']), removeItem)
 
 router.put("/update-item", verifyToken, checkPermissions(['admin']), updateItem)
 
 router.get("/get-item", verifyToken, checkPermissions(['staff', 'admin']), getItem)
 
-router.post("/add-order", verifyToken, checkPermissions(['staff', 'admin']), newOrder)
+router.post("/add-order", verifyToken, checkPermissions(['staff']), newOrder)
 
 router.delete("/delete-order", verifyToken, deleteOrder)
 
 router.post("/upload-item-image", verifyToken, checkPermissions(['admin']),  upload.single('file'), uploadItemImage)
 
-router.post("/get-monthly-order", verifyToken, checkPermissions(['admin']), monthWiseOrder)
+router.post("/get-monthly-order", verifyToken, checkPermissions(['super-admin']), monthWiseOrder)
 
-router.post("/reset-password", verifyToken, checkPermissions(['admin']), resetPassword)
+router.post("/reset-password", verifyToken, checkPermissions(['super-admin']), resetPassword)
 
-router.put("/change-role", verifyToken, checkPermissions(['admin']), updateRole)
+router.put("/change-role", verifyToken, checkPermissions(['super-admin']), updateRole)
 
-router.post("/get-daily-order", verifyToken, checkPermissions(['admin']), dailyOrder)
+router.post("/get-daily-order", verifyToken, checkPermissions(['super-admin']), dailyOrder)
 
 router.post("/add-category", verifyToken, checkPermissions(['admin']), upload.single('file'), addCategory)
 
