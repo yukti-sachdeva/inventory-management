@@ -7,19 +7,16 @@ const sendEmail = async (options) => {
         service: 'gmail',
         secure: true,
         auth: {
-
-            user: "yatinnarula99913@gmail.com",
-
-            pass: "edoorxikgfphclat",
-
+            user: 'yukti845@gmail.com',
+            pass: 'eqpakeumvrdxogsc'
         },
     });
 
     const mailOptions = {
-        from: "yukti845@gmail.com",
-        to: "sunil.r@antino.io",
-        subject: "hiii",
-        html: "   ",
+        from: process.env.SMTP_MAIL,
+        to: options.email,
+        subject: options.subject,
+        html: options.message,
     };
 
     await transporter.sendMail(mailOptions);
