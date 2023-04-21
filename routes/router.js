@@ -24,6 +24,7 @@ router.post("/add-item", verifyToken, checkPermissions(['admin']), addItem)
 
 
 router.post("/remove-item",verifyToken, checkPermissions(['admin']), removeItem)
+router.post("/remove-item",verifyToken, checkPermissions(['admin']), removeItem)
 
 router.put("/update-item", verifyToken, checkPermissions(['admin']), updateItem)
 
@@ -36,11 +37,13 @@ router.delete("/delete-order", verifyToken, deleteOrder)
 router.post("/upload-item-image", verifyToken, checkPermissions(['admin']),  upload.single('file'), uploadItemImage)
 
 router.post("/get-monthly-order", verifyToken, checkPermissions(['super-admin']), monthWiseOrder)
+router.post("/get-monthly-order", verifyToken, checkPermissions(['super-admin']), monthWiseOrder)
 
 router.post("/reset-password", verifyToken, checkPermissions(['super-admin']), resetPassword)
 
 router.put("/change-role", verifyToken, checkPermissions(['super-admin']), updateRole)
 
+router.post("/get-daily-order", verifyToken, checkPermissions(['super-admin']), dailyOrder)
 router.post("/get-daily-order", verifyToken, checkPermissions(['super-admin']), dailyOrder)
 
 router.post("/add-category", verifyToken, checkPermissions(['admin']), upload.single('file'), addCategory)

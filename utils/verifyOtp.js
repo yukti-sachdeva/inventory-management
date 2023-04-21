@@ -46,9 +46,17 @@ const verifyOtp = async(req, res) => {
     const userFound = await Otp.findOne({email: email})
     //console.log("15>>>>>>",userFound)
     if(!userFound){
-        throw new ErrorHandler("No user found", 404)
+        return res.status(404).json({
+            message: "User not found",
+            success: false 
+        })
     }
-    if(otp!=userFound.otp){throw new ErrorHandler("Wrong OTP",403)}
+    if(otp!=userFound.otp){
+        return res.status(403).json({
+            message: "Wrong OTP",
+            success: false 
+        })
+    }
     await User.findOneAndUpdate({email: email}, {isVerified: true})
     res.status(200).json({success:true,data:"otp verified"})  
     }

@@ -115,7 +115,10 @@ const userLogin = async(req, res) => {
     let { email, password} = req.body;
     const user = await User.findOne({email})
     if(!user){
-        throw new ErrorHandler("User not found",404)
+        return res.status(404).json({
+            message: "No user found",
+            success: false 
+        })
        
     }
 	console.log(SECRET);
@@ -165,7 +168,10 @@ const verifyToken = async (req, res, next) => {
             const token =  jwt.verify(headerToken, SECRET)
             const user = await User.findById(token.user_id)
             if(!user){
-                throw new ErrorHandler("User not found", 404)
+                return res.status(404).json({
+                    message: "User not found",
+                    success: false 
+                })
             }
         } catch (error) {
             return res.status(403).json({
@@ -222,7 +228,10 @@ const updateRole = async(req, res) => {
     console.log(email)
     const user = await User.findOne({email: email})
     if(!user){
-        throw new ErrorHandler("User not found",404)
+        return res.status.json({
+            message: "User not found",
+             success: false 
+        })
     }
     await User.findByIdAndUpdate(user._id, {role: role})
         return res.status(200).json({
