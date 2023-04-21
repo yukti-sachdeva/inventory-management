@@ -202,7 +202,8 @@ const serializeUser = user => {
   };
 
   const getUser = async(req, res) => {
-    let users = await User.find({})
+    let users = await User.find({role: ['staff', 'admin']})
+
     return res.status(200).json({
         message: "Here are all the users",
         users: users,
