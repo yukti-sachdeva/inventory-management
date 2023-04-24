@@ -1,6 +1,6 @@
 const category = require('../schema/category')
 const ErrorHandler=require("../utils/errorHandler")
-const item = require('../schema/items')
+const Item = require('../schema/items')
 
 const cloudinary = require("cloudinary");
     cloudinary.config({
@@ -27,10 +27,10 @@ const addCategory = async(req, res) => {
 }
 
 const deleteCategory = async(req, res) => {
-    console.log(item.findOne);
+    //console.log(item.findOne);
     const {categoryName} = req.body
     console.log("categoryNAme---->",categoryName);
-    await item.findOne({category: categoryName})
+    const catResponse = await Item.findOneAndUpdate({category: categoryName}, {category: "Null"});
     const categoryFound = await category.findOneAndDelete({categoryName: categoryName})
     if(!categoryFound){
         return res.status(404).json({

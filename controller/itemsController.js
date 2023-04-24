@@ -1,4 +1,4 @@
-const { Item } = require("../schema/items");
+const Item = require("../schema/items");
 const ErrorHandler=require("../utils/errorHandler")
 const findOrder = require("../controller/salesController");
 const category = require("../schema/category");

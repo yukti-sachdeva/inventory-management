@@ -1,5 +1,5 @@
 
-const {Item} = require('../schema/items')
+const Item = require('../schema/items')
 const Order = require('../schema/orders')
 const {getMonthlyOrder, getDailyOrder} = require("../controller/salesController")
 const ErrorHandler = require('../utils/errorHandler')

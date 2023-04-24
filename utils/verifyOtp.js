@@ -58,7 +58,7 @@ const verifyOtp = async(req, res) => {
         })
     }
     await User.findOneAndUpdate({email: email}, {isVerified: true})
-    res.status(200).json({success:true,data:"otp verified"})  
+    res.status(200).json({success:true,message:"otp verified"})  
     }
 
 
