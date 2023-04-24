@@ -72,7 +72,7 @@ const removeItem = async (req, res) => {
     }
     else{
         return res
-        .status(400)
+        .status(404)
         .json({ message: "Items not found", success: false });
     }
   } catch (error) {
