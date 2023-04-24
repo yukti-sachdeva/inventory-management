@@ -112,48 +112,49 @@ const emailRegister = async(req, res) => {
 const userLogin = async(req, res) => {
     //console.log(userCreds);
     try{
-    let { email, password} = req.body;
-    const user = await User.findOne({email})
-    if(!user){
-        return res.status(404).json({
-            message: "No user found",
-            success: false 
-        })
-       
-    }
-	console.log(SECRET);
-    let isMatch = await bcrypt.compare(password, user.password)
-    if(isMatch){
-        let token = jwt.sign({
-            user_id: user._id,
-            role: user.role,
-            username: user.username,
-            email: user.email
-        },
-        SECRET,
-        {expiresIn: "7 days"});
-
-        let result = {
-            username: user.username,
-            role: user.role,
-            email: user.email,
-            name: user.name,
-            token: token,
+        let { email, password} = req.body;
+        const user = await User.findOne({email})
+        if(!user){
+            return res.status(404).json({
+                message: "No user found",
+                success: false 
+            })
+        
         }
+        if(user.isVerified == true){
+            let isMatch = await bcrypt.compare(password, user.password)
+            if(isMatch){
+                let token = jwt.sign({
+                    user_id: user._id,
+                    role: user.role,
+                    username: user.username,
+                    email: user.email
+                },
+                SECRET,
+                {expiresIn: "7 days"});
 
-        return res.status(200).json({
-            ...result,
-            message: "Logged in successfully",
-            success: true 
-        })
-    }
+                let result = {
+                    username: user.username,
+                    role: user.role,
+                    email: user.email,
+                    name: user.name,
+                    token: token,
+                }
 
-    else{
-        return res.status(403).json({
-            message: "Incorrect password",
-            success: false 
-        })
-    }
+                return res.status(200).json({
+                    ...result,
+                    message: "Logged in successfully",
+                    success: true 
+                })
+            }
+
+            else{
+                return res.status(403).json({
+                    message: "Incorrect password",
+                    success: false 
+                })
+            }
+        }
     }catch(error){
 	console.log(error)
 }
@@ -202,7 +203,7 @@ const serializeUser = user => {
   };
 
   const getUser = async(req, res) => {
-    let users = await User.find({role: ['staff', 'admin']})
+    let users = await User.find({role: ['staff', 'admin'], isVerified: true})
 
     return res.status(200).json({
         message: "Here are all the users",
