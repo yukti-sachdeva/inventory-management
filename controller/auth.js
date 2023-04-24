@@ -155,6 +155,12 @@ const userLogin = async(req, res) => {
                 })
             }
         }
+        else{
+            return res.status(401).json({
+                message: "User is not verified",
+                sucess: false
+            })
+        }
     }catch(error){
 	console.log(error)
 }
