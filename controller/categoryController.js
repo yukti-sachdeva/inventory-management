@@ -28,7 +28,7 @@ const addCategory = async(req, res) => {
 
 const deleteCategory = async(req, res) => {
     const {categoryName} = req.body
-    await item.findOneAndUpdate({category: categoryName},{category: "Null"})
+    //await item.findOneAndUpdate({categoryName: categoryName},{categoryName: "Null"})
     const categoryFound = await category.findOneAndDelete({categoryName: categoryName})
     if(!categoryFound){
         return res.status(404).json({
@@ -36,7 +36,7 @@ const deleteCategory = async(req, res) => {
             success: false 
         })
     }
-    
+    // const deleteCategory=
     return res.status(200).json({
         message: "Catgeory deleted successfully",
         success: true 
