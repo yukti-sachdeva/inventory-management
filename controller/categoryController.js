@@ -10,7 +10,6 @@ const cloudinary = require("cloudinary");
    });
 
 const addCategory = async(req, res) => {
-    console.log("12>>>>",req.body);
     const {categoryName,description} = req.body
     console.log(req.file)
     cloudinary.uploader.upload(req.file.path, async result => {

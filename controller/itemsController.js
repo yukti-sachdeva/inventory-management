@@ -106,11 +106,11 @@ const updateItem = async (req, res) => {
 const getItem = async (req, res) => {
   // return res.send("hello")
   const itemCategory = req.query;
-  const itemExist = await existCategory(itemCategory.category);
+  const itemExistWithCategory = await existCategory(itemCategory.category);
   console.log();
-
-  if (itemExist) {
-    const items = await Item.find({ category: itemCategory.category });
+    console.log("anuj>>>",itemCategory)
+  if (itemExistWithCategory) {
+    const items = await Item.find({ category: itemCategory.category, totalQuantity: { $ne: 0 } });
     //console.log(">>>> ",items);
     return res.status(200).json({
       message: "Item is found",
