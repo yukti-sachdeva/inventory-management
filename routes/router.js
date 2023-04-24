@@ -23,7 +23,7 @@ router.post("/add-item", verifyToken, checkPermissions(['admin']), addItem)
 
 
 
-router.post("/remove-item",verifyToken, checkPermissions(['admin']), removeItem)
+//router.post("/remove-item",verifyToken, checkPermissions(['admin']), removeItem)
 router.post("/remove-item",verifyToken, checkPermissions(['admin']), removeItem)
 
 router.put("/update-item", verifyToken, checkPermissions(['admin']), updateItem)

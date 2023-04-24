@@ -27,6 +27,7 @@ const addCategory = async(req, res) => {
 }
 
 const deleteCategory = async(req, res) => {
+    console.log(item.findOne);
     const {categoryName} = req.body
     console.log("categoryNAme---->",categoryName);
     await item.findOne({category: categoryName})

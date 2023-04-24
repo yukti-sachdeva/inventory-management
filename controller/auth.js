@@ -229,7 +229,7 @@ const updateRole = async(req, res) => {
     console.log(email)
     const user = await User.findOne({email: email})
     if(!user){
-        return res.status.json({
+        return res.status(404).json({
             message: "User not found",
              success: false 
         })
